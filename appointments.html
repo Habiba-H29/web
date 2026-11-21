@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>حجز موعد</title>
+
+    <link rel="stylesheet" href="appointments.css">
+</head>
+
+<body>
+
+    <main class="appointment-page">
+
+        <header class="page-header">
+            <h1>احجز ميعادك</h1>
+            <p>يرجى مراجعة إرشادات القسم قبل تأكيد الحجز</p>
+        </header>
+
+        <div class="appointment-layout">
+
+            <!-- Booking Form -->
+            <section class="booking-card">
+
+                <h2>احجز ميعادك</h2>
+
+                <p class="price">
+                    سعر الكشف:
+                    <span id="departmentPrice">--</span>
+                </p>
+
+                <p class="selected-department">
+                    القسم:
+                    <span id="departmentName">لم يتم اختيار القسم</span>
+                </p>
+
+                <form id="appointmentForm">
+
+                    <div class="form-group">
+                        <label for="appointmentDate">التاريخ</label>
+                        <input
+                            type="date"
+                            id="appointmentDate"
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="appointmentTime">الوقت</label>
+
+                        <select id="appointmentTime" required>
+                            <option value="">اختار الوقت</option>
+                            <option value="09:00">09:00 صباحًا</option>
+                            <option value="10:00">10:00 صباحًا</option>
+                            <option value="11:00">11:00 صباحًا</option>
+                            <option value="12:00">12:00 ظهرًا</option>
+                            <option value="13:00">01:00 مساءً</option>
+                            <option value="14:00">02:00 مساءً</option>
+                            <option value="15:00">03:00 مساءً</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">ملاحظات (اختياري)</label>
+
+                        <textarea
+                            id="notes"
+                            placeholder="اكتب أي تفاصيل عن حالتك..."
+                        ></textarea>
+                    </div>
+
+                    <div class="buttons">
+
+                        <button type="reset" class="back-btn">
+                            إعادة تعيين
+                        </button>
+
+                        <button type="submit" class="confirm-btn">
+                            تأكيد الحجز
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <!-- Department Instructions -->
+            <section class="instructions-card">
+
+                <h2>الإرشادات</h2>
+
+                <p class="instructions-subtitle">
+                    تعليمات مهمة قبل زيارة القسم
+                </p>
+
+                <div id="instructionsContent">
+
+                    <div class="empty-message">
+                        <p>
+                            لم يتم تحديد القسم بعد.
+                            يرجى اختيار قسم من صفحة الخدمات.
+                        </p>
+                    </div>
+                    </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+    <script src="appointments.js"></script>
+
+</body>
+</html>
