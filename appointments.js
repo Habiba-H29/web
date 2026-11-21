@@ -232,15 +232,16 @@ function showDepartment(departmentKey) {
 
         departmentPrice.textContent = "--";
 
-        instructionsContent.innerHTML = 
+        instructionsContent.innerHTML = `
             <div class="empty-message">
                 <p>
                     لم يتم تحديد القسم بشكل صحيح.
-                    يرجى الرجوع إلى صفحة الخدمات
+                    يرجى الرجوع إلى
+                    <a href="services.html">صفحة الخدمات</a>
                     واختيار القسم المطلوب.
                 </p>
             </div>
-        ;
+        `;
 
         appointmentForm.style.display = "none";
 
@@ -298,9 +299,13 @@ function showDepartment(departmentKey) {
 }
 
 
-/* Run Department Function */
+/* Run Department Function (appointments page only) */
 
-showDepartment(selectedDepartment);
+if (appointmentForm) {
+
+    showDepartment(selectedDepartment);
+
+}
 
 
 /* Prevent Past Dates */
@@ -318,26 +323,141 @@ const month = String(today.getMonth() + 1)
 const day = String(today.getDate())
     .padStart(2, "0");
 
-dateInput.min = `${year}-${month}-${day}`;
+if (dateInput) {
+
+    dateInput.min = `${year}-${month}-${day}`;
+
+}
 
 
 /* Submit Booking */
 
-appointmentForm.addEventListener(
-    "submit",
-    function (event) {
+if (appointmentForm) {
 
-        event.preventDefault();
+    appointmentForm.addEventListener(
+        "submit",
+        function (event) {
 
-        const department =
-            departments[selectedDepartment];
+            event.preventDefault();
 
-        alert(
-            "تم إرسال طلب الحجز بنجاح!\n\n" +
-            "القسم: " + department.name + "\n" +
-            "سعر الكشف: " + department.price + " جنيه\n" +
-            "التاريخ: " + dateInput.value
-        );
+            const department =
+                departments[selectedDepartment];
 
+            alert(
+                "تم إرسال طلب الحجز بنجاح!\n\n" +
+                "القسم: " + department.name + "\n" +
+                "سعر الكشف: " + department.price + " جنيه\n" +
+                "التاريخ: " + dateInput.value
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   Services Page (added)
+   Cards are built from the departments data above,
+   so prices always match the booking page.
+   ===================================================== */
+
+const servicesGrid =
+    document.getElementById("servicesGrid");
+
+// Order of the cards on the services page
+const servicesOrder = [
+    "rabies",
+    "emergency",
+    "internal",
+    "pediatrics",
+    "gynecology",
+    "orthopedics",
+    "dental",
+    "lab"
+];
+
+// Icon and short description for each department
+const servicesInfo = {
+
+    rabies: {
+        icon: "🐕",
+        description: "تطعيمات السعار وعلاج العقر والخدش"
+    },
+
+    emergency: {
+        icon: "🚑",
+        description: "استقبال الحالات العاجلة على مدار الساعة"
+    },
+
+    internal: {
+        icon: "🩺",
+        description: "كشف وعلاج أمراض الباطنة والسكر والضغط"
+    },
+
+    pediatrics: {
+        icon: "🧒",
+        description: "رعاية الأطفال والتطعيمات الدورية"
+    },
+
+    gynecology: {
+        icon: "🤰",
+        description: "متابعة الحمل والولادة وأمراض النساء"
+    },
+
+    orthopedics: {
+        icon: "🦴",
+        description: "كسور وآلام المفاصل والعمود الفقري"
+    },
+
+    dental: {
+        icon: "🦷",
+        description: "كشف وحشو وتنظيف وخلع الأسنان"
+    },
+
+    lab: {
+        icon: "🔬",
+        description: "تحاليل طبية وأشعة عادية وسونار"
     }
-);
+
+};
+
+
+/* Display Services */
+
+function showServices() {
+
+    servicesGrid.innerHTML = servicesOrder.map(key => {
+
+        const department = departments[key];
+        const info = servicesInfo[key];
+
+        return `
+
+            <a class="service-item"
+               href="appointments.html?department=${key}">
+
+                <div class="icon">${info.icon}</div>
+
+                <h3>${department.name}</h3>
+
+                <p>${info.description}</p>
+
+                <div class="price">${department.price} جنيه</div>
+
+            </a>
+
+        `;
+
+    }).join("");
+
+}
+
+
+/* Run Services Function (services page only) */
+
+if (servicesGrid) {
+
+    showServices();
+
+}
