@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>الدفع - مستشفى الوقاية</title>
+
+    <link rel="stylesheet" href="appointments.css">
+</head>
+
+<body>
+
+    <header class="site-header">
+        <div class="container header-inner">
+            <a href="services.html" class="logo">🏥 مستشفى الوقاية</a>
+            <a href="services.html" class="header-link">كل الخدمات</a>
+        </div>
+    </header>
+
+    <main class="container payment-page">
+
+        <section class="page-header">
+            <h1>الدفع</h1>
+            <p>راجع تفاصيل الحجز واختار طريقة الدفع المناسبة</p>
+        </section>
+
+        <!-- Shown when the page is opened without booking details -->
+        <section class="pay-card" id="paymentEmpty" hidden>
+            <div class="empty-message">
+                <p>
+                    لا توجد بيانات حجز لعرضها.
+                    يرجى اختيار قسم من
+                    <a href="services.html">صفحة الخدمات</a>
+                    وإكمال الحجز أولًا.
+                </p>
+            </div>
+        </section>
+
+        <div id="paymentContent">
+
+            <!-- Booking Summary -->
+            <section class="pay-card">
+
+                <h2>ملخص الحجز</h2>
+
+                <div class="summary-row">
+                    <span class="summary-label">القسم</span>
+                    <span id="summaryDepartment">--</span>
+                </div>
+
+                <div class="summary-row">
+                    <span class="summary-label">التاريخ</span>
+                    <span id="summaryDate">--</span>
+                </div>
+
+                <div class="summary-row">
+                    <span class="summary-label">الوقت</span>
+                    <span id="summaryTime">--</span>
+                </div>
+
+                <div class="summary-row summary-total">
+                    <span class="summary-label">الإجمالي</span>
+                    <span id="summaryTotal">--</span>
+                </div>
+
+            </section>
+
+
+            <!-- Payment Method -->
+            <section class="pay-card">
+
+                <h2>طريقة الدفع</h2>
+
+                <form id="paymentForm" novalidate>
+
+                    <div class="method-options">
+
+                        <label class="method-option active">
+                            <input type="radio" name="paymentMethod" value="card" checked>
+                            <span>💳 كارت بنكي</span>
+                        </label>
+
+                        <label class="method-option">
+                            <input type="radio" name="paymentMethod" value="wallet">
+                            <span>📱 محفظة إلكترونية</span>
+                        </label>
+
+                        <label class="method-option">
+                            <input type="radio" name="paymentMethod" value="cash">
+                            <span>🏥 في المستشفى</span>
+                        </label>
+
+                    </div>
+
+
+                    <!-- Card -->
+                    <div class="method-panel" id="cardFields">
+
+                        <div class="form-group">
+                            <label for="cardNumber">رقم الكارت</label>
+                            <input
+                                type="text"
+                                id="cardNumber"
+                                inputmode="numeric"
+                                autocomplete="off"
+                                maxlength="19"
+                                placeholder="1234 5678 9012 3456"
+                            >
+                        </div>
+
+                        <div class="form-row">
+
+                            <div class="form-group">
+                                <label for="cardExpiry">تاريخ الانتهاء</label>
+                                <input
+                                    type="text"
+                                    id="cardExpiry"
+                                    inputmode="numeric"
+                                    autocomplete="off"
+                                    maxlength="5"
+                                    placeholder="MM/YY"
+                                >
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cardCvv">CVV</label>
+                                <input
+                                    type="password"
+                                    id="cardCvv"
+                                    inputmode="numeric"
+                                    autocomplete="off"
+                                    maxlength="4"
+                                    placeholder="***"
+                                >
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Wallet -->
+                    <div class="method-panel" id="walletFields" hidden>
+
+                        <div class="form-group">
+                            <label for="walletNumber">رقم المحفظة</label>
+                            <input
+                                type="text"
+                                id="walletNumber"
+                                inputmode="numeric"
+                                autocomplete="off"
+                                maxlength="11"
+                                placeholder="01xxxxxxxxx"
+                            >
+                        </div>
+
+                        <p class="method-note">
+                            هيوصلك طلب دفع على المحفظة لتأكيد العملية.
+                        </p>
+
+                    </div>
+
+
+                    <!-- Cash -->
+                    <div class="method-panel" id="cashFields" hidden>
+
+                        <p class="method-note">
+                            هتدفع سعر الكشف في المستشفى عند الوصول.
+                            يرجى الحضور قبل الموعد بـ 15 دقيقة.
+                        </p>
+
+                    </div>
+
+
+                    <p class="form-error" id="paymentError" hidden></p>
+
+                    <div class="buttons pay-buttons">
+
+                        <button type="submit" class="confirm-btn">
+                            تأكيد
+                        </button>
+
+                        <button type="button" class="back-btn" id="cancelPayment">
+                            إلغاء
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+        </div>
+
+
+        <!-- Success -->
+        <section class="pay-card success-card" id="paymentSuccess" hidden>
+
+            <div class="success-icon">✔</div>
+
+            <h2>تم تأكيد الحجز</h2>
+
+            <p id="successMessage"></p>
+
+            <p class="booking-ref">
+                رقم الحجز:
+                <strong id="bookingRef">--</strong>
+            </p>
+
+            <div class="buttons pay-buttons">
+                <a href="services.html" class="confirm-btn link-btn">
+                    الرجوع للخدمات
+                </a>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        © مستشفى الوقاية
+    </footer>
+
+    <script src="appointments.js"></script>
+
+</body>
+
+</html>
