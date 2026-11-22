@@ -343,24 +343,23 @@ if (appointmentForm) {
             const department =
                 departments[selectedDepartment];
 
-            alert(
-                "تم إرسال طلب الحجز بنجاح!\n\n" +
-                "القسم: " + department.name + "\n" +
-                "سعر الكشف: " + department.price + " جنيه\n" +
-                "التاريخ: " + dateInput.value
-            );
+            // Go to the payment page with the booking details
+            const timeInput =
+                document.getElementById("appointmentTime");
+
+            const bookingParams = new URLSearchParams({
+                department: selectedDepartment,
+                date: dateInput.value,
+                time: timeInput.value
+            });
+
+            window.location.href =
+                "payment.html?" + bookingParams.toString();
 
         }
     );
 
 }
-
-
-/* =====================================================
-   Services Page (added)
-   Cards are built from the departments data above,
-   so prices always match the booking page.
-   ===================================================== */
 
 const servicesGrid =
     document.getElementById("servicesGrid");
@@ -459,5 +458,279 @@ function showServices() {
 if (servicesGrid) {
 
     showServices();
+
+}
+
+const paymentForm =
+    document.getElementById("paymentForm");
+
+if (paymentForm) {
+
+    const payDepartment = departments[params.get("department")];
+    const payDate = params.get("date");
+    const payTime = params.get("time");
+
+    const paymentContent = document.getElementById("paymentContent");
+    const paymentEmpty = document.getElementById("paymentEmpty");
+    const paymentSuccess = document.getElementById("paymentSuccess");
+    const paymentError = document.getElementById("paymentError");
+
+    const cardNumber = document.getElementById("cardNumber");
+    const cardExpiry = document.getElementById("cardExpiry");
+    const cardCvv = document.getElementById("cardCvv");
+    const walletNumber = document.getElementById("walletNumber");
+
+    const panels = {
+        card: document.getElementById("cardFields"),
+        wallet: document.getElementById("walletFields"),
+        cash: document.getElementById("cashFields")
+    };
+
+    const methodNames = {
+        card: "كارت بنكي",
+        wallet: "محفظة إلكترونية",
+        cash: "الدفع في المستشفى"
+    };
+
+
+    /* Formatting helpers */
+
+    function formatArabicDate(value) {
+
+        const date = new Date(value + "T00:00:00");
+
+        if (isNaN(date)) {
+            return value;
+        }
+
+        return date.toLocaleDateString("ar-EG", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        });
+
+    }
+
+    function formatArabicTime(value) {
+
+        const [hours, minutes] = value.split(":").map(Number);
+
+        const period = hours < 12 ? "ص" : "م";
+        const hour12 = String(hours % 12 || 12).padStart(2, "0");
+
+        return hour12 + ":" +
+            String(minutes).padStart(2, "0") + " " + period;
+
+    }
+
+    function showError(message) {
+
+        paymentError.textContent = message;
+        paymentError.hidden = false;
+
+    }
+
+
+    /* Booking summary */
+
+    if (!payDepartment || !payDate || !payTime) {
+
+        paymentContent.hidden = true;
+        paymentEmpty.hidden = false;
+
+    } else {
+
+        document.getElementById("summaryDepartment").textContent =
+            payDepartment.name;
+
+        document.getElementById("summaryDate").textContent =
+            formatArabicDate(payDate);
+
+        document.getElementById("summaryTime").textContent =
+            formatArabicTime(payTime);
+
+        document.getElementById("summaryTotal").textContent =
+            payDepartment.price + " جنيه";
+
+    }
+
+
+    /* Switch payment method */
+
+    function getMethod() {
+
+        return paymentForm.querySelector(
+            'input[name="paymentMethod"]:checked'
+        ).value;
+
+    }
+
+    paymentForm.querySelectorAll(
+        'input[name="paymentMethod"]'
+    ).forEach(radio => {
+
+        radio.addEventListener("change", function () {
+
+            const method = getMethod();
+
+            Object.keys(panels).forEach(key => {
+                panels[key].hidden = key !== method;
+            });
+
+            paymentForm.querySelectorAll(".method-option")
+                .forEach(option => {
+                    option.classList.toggle(
+                        "active",
+                        option.contains(radio) && radio.checked
+                    );
+                });
+
+            paymentError.hidden = true;
+
+        });
+
+    });
+
+
+    /* Input formatting */
+
+    cardNumber.addEventListener("input", function () {
+
+        const digits = cardNumber.value
+            .replace(/\D/g, "")
+            .slice(0, 16);
+
+        cardNumber.value = digits.replace(/(.{4})/g, "$1 ").trim();
+
+    });
+
+    cardExpiry.addEventListener("input", function () {
+
+        let digits = cardExpiry.value
+            .replace(/\D/g, "")
+            .slice(0, 4);
+
+        if (digits.length > 2) {
+            digits = digits.slice(0, 2) + "/" + digits.slice(2);
+        }
+
+        cardExpiry.value = digits;
+
+    });
+
+    cardCvv.addEventListener("input", function () {
+
+        cardCvv.value = cardCvv.value
+            .replace(/\D/g, "")
+            .slice(0, 4);
+
+    });
+
+    walletNumber.addEventListener("input", function () {
+
+        walletNumber.value = walletNumber.value
+            .replace(/\D/g, "")
+            .slice(0, 11);
+
+    });
+
+
+    /* Validation */
+
+    function validatePayment(method) {
+
+        if (method === "card") {
+
+            const digits = cardNumber.value.replace(/\s/g, "");
+
+            if (digits.length !== 16) {
+                return "رقم الكارت لازم يكون 16 رقم.";
+            }
+
+            const expiry = cardExpiry.value.match(/^(\d{2})\/(\d{2})$/);
+
+            if (!expiry || Number(expiry[1]) < 1 || Number(expiry[1]) > 12) {
+                return "اكتب تاريخ الانتهاء بالشكل MM/YY.";
+            }
+
+            const now = new Date();
+            const expiryYear = 2000 + Number(expiry[2]);
+            const expiryMonth = Number(expiry[1]);
+
+            if (
+                expiryYear < now.getFullYear() ||
+                (expiryYear === now.getFullYear() &&
+                    expiryMonth < now.getMonth() + 1)
+            ) {
+                return "الكارت منتهي الصلاحية.";
+            }
+
+            if (!/^\d{3,4}$/.test(cardCvv.value)) {
+                return "رمز CVV لازم يكون 3 أو 4 أرقام.";
+            }
+
+        }
+
+        if (method === "wallet") {
+
+            if (!/^01[0125]\d{8}$/.test(walletNumber.value)) {
+                return "اكتب رقم محفظة صحيح مكوّن من 11 رقم.";
+            }
+
+        }
+
+        return "";
+
+    }
+
+
+    /* Confirm payment */
+
+    paymentForm.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+        const method = getMethod();
+        const errorMessage = validatePayment(method);
+
+        if (errorMessage) {
+            showError(errorMessage);
+            return;
+        }
+
+        paymentError.hidden = true;
+
+        const reference = "WQ-" +
+            Math.floor(100000 + Math.random() * 900000);
+
+        document.getElementById("bookingRef").textContent = reference;
+
+        document.getElementById("successMessage").textContent =
+            "تم حجز ميعادك في قسم " + payDepartment.name +
+            " يوم " + formatArabicDate(payDate) +
+            " الساعة " + formatArabicTime(payTime) +
+            " (" + methodNames[method] + ").";
+
+        paymentContent.hidden = true;
+        paymentSuccess.hidden = false;
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+    });
+
+
+    /* Cancel: back to the booking page */
+
+    document.getElementById("cancelPayment")
+        .addEventListener("click", function () {
+
+            const key = params.get("department");
+
+            window.location.href = departments[key]
+                ? "appointments.html?department=" + key
+                : "services.html";
+
+        });
 
 }
